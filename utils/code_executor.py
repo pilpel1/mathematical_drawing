@@ -36,7 +36,8 @@ class SafeCodeExecutor:
                 'abs': abs,
                 'sum': sum,
                 'round': round,
-                'pow': pow
+                'pow': pow,
+                'enumerate': enumerate
             }
         }
 

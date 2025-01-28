@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -16,6 +17,10 @@ class GeminiService:
         # הגדרת Gemini
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash-thinking-exp-01-21')
+        
+        # הגדרות retry
+        self.max_retries = 3
+        self.retry_delay = 2  # שניות
 
     def generate_code(self, description: str) -> str:
         """
@@ -31,14 +36,34 @@ class GeminiService:
            - Add plt.rcParams['font.size'] = 12
            - For any Hebrew text, write it from left to right but add [::-1] at the end
              Example: title = "שרטוט מתמטי"[::-1]
-        5. Use plt.savefig() instead of plt.show()
-        6. Clean up the plot after saving using plt.close()
-        7. Make sure to set figure size to (10, 10) for better visibility
-        8. Add grid and proper axis labels
+        5. When setting axis labels and ticks:
+           - First use ax.set_xticks() to set tick positions
+           - Then use ax.set_xticklabels() to set labels
+           - Do the same for y-axis
+        6. Use plt.savefig() instead of plt.show()
+        7. Clean up the plot after saving using plt.close()
+        8. Make sure to set figure size to (10, 10)
+        9. For the plot style:
+           - For geometric shapes (circles, triangles, polygons etc.) use a clean white background without grid or axes unless specifically requested
+           - For functions and analytical geometry (graphs, curves, etc.) include a proper coordinate system with grid
+           - Always use plt.axis('equal') for geometric shapes to maintain proportions
+           - Use clear, contrasting colors for better visibility
         """
 
-        response = self.model.generate_content(prompt)
-        return self._extract_code(response.text)
+        last_error = None
+        for attempt in range(self.max_retries):
+            try:
+                response = self.model.generate_content(prompt)
+                return self._extract_code(response.text)
+            except Exception as e:
+                last_error = e
+                if "500" in str(e):
+                    # אם זו שגיאת שרת, נחכה ונסה שוב
+                    if attempt < self.max_retries - 1:  # אם זה לא הניסיון האחרון
+                        time.sleep(self.retry_delay * (attempt + 1))  # המתנה גדלה עם כל ניסיון
+                        continue
+                # אם זו לא שגיאת 500 או שזה הניסיון האחרון, נזרוק את השגיאה
+                raise RuntimeError(f"נכשל ליצור קוד אחרי {self.max_retries} ניסיונות. שגיאה אחרונה: {str(last_error)}")
 
     def validate_code(self, code: str) -> bool:
         """
