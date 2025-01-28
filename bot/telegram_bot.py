@@ -1,9 +1,11 @@
 import os
 import logging
+import asyncio
 from pathlib import Path
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.error import NetworkError, TimedOut
 
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
@@ -92,6 +94,17 @@ class MathDrawingBot:
             else:
                 await update.message.reply_text(error_message)
 
+    async def error_handler(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """טיפול בשגיאות"""
+        try:
+            raise context.error
+        except (NetworkError, TimedOut):
+            # במקרה של שגיאת רשת, ננסה שוב אחרי 5 שניות
+            logger.warning("שגיאת רשת, מנסה שוב בעוד 5 שניות...")
+            await asyncio.sleep(5)
+        except Exception as e:
+            logger.error(f"שגיאה לא צפויה: {str(e)}")
+
     def run(self):
         """הפעלת הבוט"""
         # יצירת האפליקציה
@@ -104,9 +117,12 @@ class MathDrawingBot:
         # הוספת הטיפול בהודעות טקסט
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
 
+        # הוספת טיפול בשגיאות
+        application.add_error_handler(self.error_handler)
+
         # הפעלת הבוט
         logger.info("הבוט מתחיל לרוץ...")
-        application.run_polling(allowed_updates=Update.ALL_TYPES)
+        application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 if __name__ == "__main__":
     bot = MathDrawingBot()
