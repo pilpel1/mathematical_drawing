@@ -1,11 +1,22 @@
 import os
 import logging
+from pathlib import Path
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-# טעינת משתני הסביבה
-load_dotenv()
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+
+from services.gemini_service import GeminiService
+from services.renderer_service import RendererService
+
+# ביטול לוגים של HTTPX
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+# טעינת משתני הסביבה מהתיקייה הראשית של הפרויקט
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(env_path)
 
 # הגדרת לוגים
 logging.basicConfig(
@@ -19,6 +30,10 @@ class MathDrawingBot:
         self.token = os.getenv('TELEGRAM_TOKEN')
         if not self.token:
             raise ValueError("לא נמצא טוקן לבוט טלגרם!")
+        
+        # יצירת השירותים
+        self.gemini_service = GeminiService()
+        self.renderer_service = RendererService()
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """טיפול בפקודת /start"""
@@ -44,11 +59,38 @@ class MathDrawingBot:
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """טיפול בהודעות טקסט רגילות"""
-        # בשלב זה נחזיר רק הודעת אישור
-        await update.message.reply_text(
-            f"קיבלתי את הבקשה שלך: '{update.message.text}'\n"
-            "בקרוב אוכל לייצר עבורך את השרטוט המבוקש!"
-        )
+        try:
+            # שליחת הודעת המתנה
+            processing_message = await update.message.reply_text(
+                "מעבד את הבקשה שלך... 🎨"
+            )
+            
+            # יצירת הקוד באמצעות Gemini
+            code = self.gemini_service.generate_code(update.message.text)
+            
+            # וידוא שהקוד בטוח
+            if not self.gemini_service.validate_code(code):
+                await processing_message.edit_text("מצטער, הקוד שנוצר אינו בטוח להרצה 😕")
+                return
+            
+            # יצירת התמונה
+            img_data = self.renderer_service.create_image(code)
+            
+            # שליחת התמונה
+            await update.message.reply_photo(
+                photo=img_data,
+                caption="הנה השרטוט שביקשת! 🎨"
+            )
+            
+            # מחיקת הודעת ההמתנה
+            await processing_message.delete()
+            
+        except Exception as e:
+            error_message = f"מצטער, נתקלתי בשגיאה: {str(e)} 😕"
+            if 'processing_message' in locals():
+                await processing_message.edit_text(error_message)
+            else:
+                await update.message.reply_text(error_message)
 
     def run(self):
         """הפעלת הבוט"""
