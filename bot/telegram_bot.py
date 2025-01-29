@@ -31,9 +31,9 @@ class MathDrawingBot:
     def __init__(self):
         self.token = os.getenv('TELEGRAM_TOKEN')
         if not self.token:
-            raise ValueError("לא נמצא טוקן לבוט טלגרם!")
+            raise ValueError("Telegram token not found!")
         
-        # יצירת השירותים
+        # Initialize services
         self.gemini_service = GeminiService()
         self.renderer_service = RendererService()
 
@@ -73,14 +73,14 @@ class MathDrawingBot:
         await update.message.reply_text(help_message)
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """טיפול בהודעות טקסט רגילות"""
+        """Handle regular text messages"""
         try:
-            # שליחת הודעת המתנה
+            # Send waiting message
             processing_message = await update.message.reply_text(
                 "מעבד את הבקשה שלך... 🎨"
             )
             
-            # יצירת הקוד באמצעות Gemini
+            # Generate code using Gemini
             try:
                 code = self.gemini_service.generate_code(update.message.text)
             except RuntimeError as e:
@@ -92,28 +92,28 @@ class MathDrawingBot:
                     return
                 raise  # Re-raise if it's not a rate limit error
             
-            # וידוא שהקוד בטוח
+            # Validate code safety
             if not self.gemini_service.validate_code(code):
                 await processing_message.edit_text("מצטער, הקוד שנוצר אינו בטוח להרצה 😕")
                 return
             
-            # יצירת התמונה
+            # Create image
             img_data = self.renderer_service.create_image(code)
             
-            # שליחת התמונה
+            # Send image
             await update.message.reply_photo(
                 photo=img_data,
                 caption="הנה השרטוט שביקשת! 🎨"
             )
             
-            # מחיקת הודעת ההמתנה
+            # Delete processing message
             await processing_message.delete()
             
         except Exception as e:
-            # רישום השגיאה המלאה בלוגים
+            # Log the full error
             logger.error(f"Error processing request: {str(e)}", exc_info=True)
             
-            # שליחת הודעה כללית למשתמש
+            # Send general error message to user
             error_message = "מצטער, נתקלתי בשגיאה בעיבוד הבקשה. אנא נסה שוב או נסח את הבקשה בצורה שונה 😕"
             if 'processing_message' in locals():
                 await processing_message.edit_text(error_message)
@@ -121,32 +121,40 @@ class MathDrawingBot:
                 await update.message.reply_text(error_message)
 
     async def error_handler(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """טיפול בשגיאות"""
+        """Handle errors"""
         try:
             raise context.error
         except (NetworkError, TimedOut):
-            # במקרה של שגיאת רשת, ננסה שוב אחרי 5 שניות
+            # On network error, retry after 5 seconds
             logger.warning("Network error, retrying in 5 seconds...")
             await asyncio.sleep(5)
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}")
 
+    async def cleanup(self, application: Application) -> None:
+        """Cleanup resources before bot shutdown"""
+        logger.info("Cleaning up resources...")
+        logger.info("Cleanup completed")
+
     def run(self):
-        """הפעלת הבוט"""
-        # יצירת האפליקציה
+        """Run the bot"""
+        # Create application
         application = Application.builder().token(self.token).build()
 
-        # הוספת הטיפול בפקודות
+        # Add command handlers
         application.add_handler(CommandHandler("start", self.start))
         application.add_handler(CommandHandler("help", self.help))
         
-        # הוספת הטיפול בהודעות טקסט
+        # Add text message handler
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
 
-        # הוספת טיפול בשגיאות
+        # Add error handler
         application.add_error_handler(self.error_handler)
 
-        # הפעלת הבוט
+        # Set cleanup function for shutdown
+        application.post_shutdown = lambda app: self.cleanup(app)
+
+        # Start the bot
         logger.info("Bot is starting...")
         application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
