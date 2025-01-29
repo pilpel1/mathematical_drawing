@@ -23,6 +23,11 @@ ENV/
 # Project specific
 output/
 temp/
+
+# Allow examples directory images but ignore other images
 *.png
 *.jpg
-*.jpeg 
+*.jpeg
+!examples/*.png
+!examples/*.jpg
+!examples/*.jpeg 
