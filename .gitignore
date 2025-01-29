@@ -35,8 +35,7 @@ ENV/
 .env.local
 
 # Logs
-logs/*
-!logs/code_execution.json
+logs/
 *.log
 
 # Project specific
