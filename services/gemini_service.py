@@ -1,8 +1,14 @@
 import os
 import time
+import logging
 from pathlib import Path
 from dotenv import load_dotenv
 import google.generativeai as genai
+from bidi.algorithm import get_display
+from utils.config import ALLOWED_MODULES
+
+# הגדרת לוגר
+logger = logging.getLogger(__name__)
 
 # טעינת משתני הסביבה
 env_path = Path(__file__).parent.parent / '.env'
@@ -26,6 +32,8 @@ class GeminiService:
         """
         מקבל תיאור מילולי ומייצר קוד matplotlib מתאים
         """
+        logger.info(f"Generating code for description: {description}")
+        
         prompt = f"""Create matplotlib code for the following mathematical drawing: {description}
         Important guidelines:
         1. Use only matplotlib and math libraries
@@ -34,8 +42,10 @@ class GeminiService:
         4. For Hebrew text in labels or titles:
            - Use plt.rcParams['font.family'] = 'Arial' at the start
            - Add plt.rcParams['font.size'] = 12
-           - For any Hebrew text, write it from left to right but add [::-1] at the end
-             Example: title = "שרטוט מתמטי"[::-1]
+           - For any Hebrew text, use bidi layout by:
+             * First add: from bidi.algorithm import get_display
+             * Then wrap Hebrew text with get_display()
+             Example: title = get_display("שרטוט מתמטי")
         5. When setting axis labels and ticks:
            - First use ax.set_xticks() to set tick positions
            - Then use ax.set_xticklabels() to set labels
@@ -53,40 +63,38 @@ class GeminiService:
         last_error = None
         for attempt in range(self.max_retries):
             try:
+                logger.info(f"Attempt {attempt + 1}/{self.max_retries} to generate code")
                 response = self.model.generate_content(prompt)
-                return self._extract_code(response.text)
+                code = self._extract_code(response.text)
+                logger.info("Code generated successfully")
+                logger.debug(f"Generated code:\n{code}")
+                return code
             except Exception as e:
                 last_error = e
                 if "500" in str(e):
-                    # אם זו שגיאת שרת, נחכה ונסה שוב
-                    if attempt < self.max_retries - 1:  # אם זה לא הניסיון האחרון
-                        time.sleep(self.retry_delay * (attempt + 1))  # המתנה גדלה עם כל ניסיון
+                    logger.warning(f"Server error on attempt {attempt + 1}, retrying...")
+                    if attempt < self.max_retries - 1:
+                        time.sleep(self.retry_delay * (attempt + 1))
                         continue
-                # אם זו לא שגיאת 500 או שזה הניסיון האחרון, נזרוק את השגיאה
+                logger.error(f"Failed to generate code: {str(e)}", exc_info=True)
                 raise RuntimeError(f"נכשל ליצור קוד אחרי {self.max_retries} ניסיונות. שגיאה אחרונה: {str(last_error)}")
 
     def validate_code(self, code: str) -> bool:
         """
         בודק שהקוד בטוח ומתאים להרצה
         """
-        # רשימת מילים אסורות
-        forbidden = ['exec', 'eval', 'import os', 'subprocess', 'system']
+        logger.info("Starting code validation")
+        logger.debug(f"Code to validate:\n{code}")
         
-        # רשימת ספריות מותרות
-        allowed_imports = ['matplotlib', 'numpy', 'math']
-        
-        code_lower = code.lower()
-        
-        # בדיקת מילים אסורות
-        if any(word in code_lower for word in forbidden):
-            return False
-            
         # בדיקת ייבוא ספריות
         import_lines = [line.strip() for line in code.split('\n') 
                        if line.strip().startswith('import') or 'from' in line]
         
+        logger.info("Found import lines:")
         for line in import_lines:
-            if not any(lib in line for lib in allowed_imports):
+            logger.info(f"  {line}")
+            if not any(lib in line for lib in ALLOWED_MODULES):
+                logger.warning(f"Validation failed: Unauthorized import: {line}")
                 return False
                 
         return True
@@ -95,6 +103,8 @@ class GeminiService:
         """
         מחלץ את הקוד מתוך תשובת Gemini
         """
+        logger.debug(f"Extracting code from response:\n{response}")
+        
         # אם התשובה מכילה בלוק קוד
         if '```python' in response:
             code = response.split('```python')[1].split('```')[0]
@@ -103,7 +113,9 @@ class GeminiService:
         else:
             code = response
             
-        return code.strip()
+        extracted_code = code.strip()
+        logger.debug(f"Extracted code:\n{extracted_code}")
+        return extracted_code
 
 if __name__ == "__main__":
     # דוגמה לשימוש

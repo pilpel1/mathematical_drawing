@@ -1,6 +1,6 @@
 # 🎨 Mathematical Drawing Bot | בוט ציור מתמטי
 
-[English](#english) | [עברית](#hebrew)
+[English](#english) | [עברית](#hebrew) | [Examples/דוגמאות](#examples)
 
 ---
 
@@ -41,11 +41,6 @@ GEMINI_API_KEY=your_gemini_api_key
 python bot/telegram_bot.py
 ```
 
-### 📝 דוגמאות לשימוש
-- "צייר מעגל במרכז עם רדיוס 5 ובתוכו משולש שווה צלעות"
-- "שרטט פרבולה y=x^2 בתחום [-5,5]"
-- "צייר גרף של פונקציית sin(x) בתחום [-2π,2π]"
-
 ### 🔧 טכנולוגיות
 - Python 3.10+
 - python-telegram-bot
@@ -56,19 +51,23 @@ python bot/telegram_bot.py
 ### 🏗️ מבנה הפרויקט
 ```
 mathematical_drawing/
-├── requirements.txt  # תלויות הפרויקט
-├── .env             # משתני סביבה
-├── README.md        # תיעוד הפרויקט
-├── bot/            # מודול הבוט
-│   ├── telegram_bot.py  # הבוט עצמו
+├── requirements.txt     # תלויות הפרויקט
+├── .env                # משתני סביבה
+├── README.md           # תיעוד הפרויקט
+├── examples/           # דוגמאות לתוצאות הבוט
+├── bot/               # מודול הבוט
+│   ├── telegram_bot.py # הבוט עצמו
 │   └── __init__.py
-├── services/       # שירותים
+├── services/          # שירותים
 │   ├── gemini_service.py   # שירות ה-AI
 │   ├── renderer_service.py # שירות הרינדור
 │   └── __init__.py
-└── utils/          # כלי עזר
-    ├── code_executor.py    # מריץ הקוד
-    └── __init__.py
+├── utils/             # כלי עזר
+│   ├── code_executor.py    # מריץ הקוד
+│   ├── config.py          # הגדרות
+│   └── __init__.py
+└── logs/              # קבצי לוג
+    └── code_execution.json # לוג ביצועי קוד
 ```
 
 ### 👥 תרומה לפרויקט
@@ -78,6 +77,26 @@ mathematical_drawing/
 פרויקט זה מופץ תחת רישיון MIT.
 
 </div>
+
+---
+
+## <a name="examples">📝 Examples / דוגמאות</a>
+
+| Description | Result |
+|------------|--------|
+| פונקציית הפרפר | ![פונקציית הפרפר](examples/פונקציית%20הפרפר.jpg) |
+| התשובה לחיים ליקום וכל השאר | ![התשובה לחיים](examples/התשובה%20לחיים%20ליקום%20וכל%20השאר.jpg) |
+| sin(3x+y)x=y | ![sin(3x+y)x=y](examples/sin(3x%2By)x%3Dy.jpg) |
+| אפיציקלואיד | ![אפיציקלואיד](examples/אפיציקלואיד.jpg) |
+| r=a במערכת צירים פולרית | ![r=a במערכת צירים פולרית](examples/r%3Da%20במערכת%20צירים%20פולרית.jpg) |
+| הלוגו של האולימפיאדה | ![לוגו האולימפיאדה](examples/הלוגו%20של%20האולימפיאדה.jpg) |
+| sin(x+y) | ![sin(x+y)](examples/sin(x%2By).jpg) |
+| תורת הקבוצות - דיאגרמת ון | ![דיאגרמת ון](examples/תורת%20הקבוצות%20-%20דיגארמת%20ון%20להמחשת%20קבוצות%20מספרים%20שכלולות%20זו%20בזו.jpg) |
+| טור פורייה | ![טור פורייה](examples/טור%20פורייה.jpg) |
+| מגדלי האנוי | ![מגדלי האנוי](examples/מגדלי%20האנוי.jpg) |
+| פונקציית הערך המוחלט של סינוס הגג של X | ![פונקציית הערך המוחלט](examples/פוקנציית%20הערך%20המוחלט%20של%20סינוס%20הגג%20של%20X.jpg) |
+| פרקטל | ![פרקטל](examples/פרקטל.jpg) |
+| אינטגרל מסוים של פונקציית הסינוס | ![אינטגרל](examples/אינטגרל%20מסוים%20של%20פונקציית%20הסינוס%2C%20בין%20π%20לבין%203π.jpg) |
 
 ---
 
@@ -116,11 +135,6 @@ GEMINI_API_KEY=your_gemini_api_key
 python bot/telegram_bot.py
 ```
 
-### 📝 Usage Examples
-- "Draw a circle with radius 5 and an equilateral triangle inside"
-- "Plot the parabola y=x^2 in the range [-5,5]"
-- "Draw the graph of sin(x) in the range [-2π,2π]"
-
 ### 🔧 Technologies
 - Python 3.10+
 - python-telegram-bot
@@ -131,19 +145,23 @@ python bot/telegram_bot.py
 ### 🏗️ Project Structure
 ```
 mathematical_drawing/
-├── requirements.txt  # Project dependencies
-├── .env             # Environment variables
-├── README.md        # Project documentation
-├── bot/            # Bot module
-│   ├── telegram_bot.py  # The bot itself
+├── requirements.txt     # Project dependencies
+├── .env                # Environment variables
+├── README.md           # Project documentation
+├── examples/           # Bot output examples
+├── bot/               # Bot module
+│   ├── telegram_bot.py # The bot itself
 │   └── __init__.py
-├── services/       # Services
+├── services/          # Services
 │   ├── gemini_service.py   # AI service
 │   ├── renderer_service.py # Rendering service
 │   └── __init__.py
-└── utils/          # Utilities
-    ├── code_executor.py    # Code executor
-    └── __init__.py
+├── utils/             # Utilities
+│   ├── code_executor.py    # Code executor
+│   ├── config.py          # Configuration
+│   └── __init__.py
+└── logs/              # Log files
+    └── code_execution.json # Code execution log
 ```
 
 ### 👥 Contributing
