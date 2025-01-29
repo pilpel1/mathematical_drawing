@@ -84,19 +84,19 @@ mathematical_drawing/
 
 | Description | Result |
 |:---:|:---:|
-| <div dir="rtl">פונקציית הפרפר</div> | <img src="examples/פונקציית%20הפרפר.jpg" width="300"/> |
-| <div dir="rtl">התשובה לחיים ליקום וכל השאר</div> | <img src="examples/התשובה%20לחיים%20ליקום%20וכל%20השאר.jpg" width="300"/> |
-| sin(3x+y)/x=y | <img src="examples/sin(3x%2By)x%3Dy.jpg" width="300"/> |
-| <div dir="rtl">אפיציקלואיד</div> | <img src="examples/אפיציקלואיד.jpg" width="300"/> |
-| <div dir="rtl">r=a במערכת צירים פולרית</div> | <img src="examples/r%3Da%20במערכת%20צירים%20פולרית.jpg" width="300"/> |
-| <div dir="rtl">הלוגו של האולימפיאדה</div> | <img src="examples/הלוגו%20של%20האולימפיאדה.jpg" width="300"/> |
-| sin(x+y) | <img src="examples/sin(x%2By).jpg" width="300"/> |
-| <div dir="rtl">תורת הקבוצות - דיאגרמת ון</div> | <img src="examples/תורת%20הקבוצות%20-%20דיגארמת%20ון%20להמחשת%20קבוצות%20מספרים%20שכלולות%20זו%20בזו.jpg" width="300"/> |
-| <div dir="rtl">טור פורייה</div> | <img src="examples/טור%20פורייה.jpg" width="300"/> |
-| <div dir="rtl">מגדלי האנוי</div> | <img src="examples/מגדלי%20האנוי.jpg" width="300"/> |
-| <div dir="rtl">פונקציית הערך המוחלט של סינוס הגג של X</div> | <img src="examples/פוקנציית%20הערך%20המוחלט%20של%20סינוס%20הגג%20של%20X.jpg" width="300"/> |
-| <div dir="rtl">פרקטל</div> | <img src="examples/פרקטל.jpg" width="300"/> |
-| <div dir="rtl">אינטגרל מסוים של פונקציית הסינוס</div> | <img src="examples/אינטגרל%20מסוים%20של%20פונקציית%20הסינוס%2C%20בין%20π%20לבין%203π.jpg" width="300"/> |
+| <div dir="rtl">פונקציית הפרפר</div> | <img src="examples/פונקציית%20הפרפר.jpg" width="400"/> |
+| <div dir="rtl">התשובה לחיים ליקום וכל השאר</div> | <img src="examples/התשובה%20לחיים%20ליקום%20וכל%20השאר.jpg" width="400"/> |
+| sin(3x+y)/x=y | <img src="examples/sin(3x%2By)x%3Dy.jpg" width="400"/> |
+| <div dir="rtl">אפיציקלואיד</div> | <img src="examples/אפיציקלואיד.jpg" width="400"/> |
+| <div dir="rtl">r=a במערכת צירים פולרית</div> | <img src="examples/r%3Da%20במערכת%20צירים%20פולרית.jpg" width="400"/> |
+| <div dir="rtl">הלוגו של האולימפיאדה</div> | <img src="examples/הלוגו%20של%20האולימפיאדה.jpg" width="400"/> |
+| sin(x+y) | <img src="examples/sin(x%2By).jpg" width="400"/> |
+| <div dir="rtl">תורת הקבוצות - דיאגרמת ון</div> | <img src="examples/תורת%20הקבוצות%20-%20דיגארמת%20ון%20להמחשת%20קבוצות%20מספרים%20שכלולות%20זו%20בזו.jpg" width="400"/> |
+| <div dir="rtl">טור פורייה</div> | <img src="examples/טור%20פורייה.jpg" width="400"/> |
+| <div dir="rtl">מגדלי האנוי</div> | <img src="examples/מגדלי%20האנוי.jpg" width="400"/> |
+| <div dir="rtl">פונקציית הערך המוחלט של סינוס הגג של X</div> | <img src="examples/פוקנציית%20הערך%20המוחלט%20של%20סינוס%20הגג%20של%20X.jpg" width="400"/> |
+| <div dir="rtl">פרקטל</div> | <img src="examples/פרקטל.jpg" width="400"/> |
+| <div dir="rtl">אינטגרל מסוים של פונקציית הסינוס</div> | <img src="examples/אינטגרל%20מסוים%20של%20פונקציית%20הסינוס%2C%20בין%20π%20לבין%203π.jpg" width="400"/> |
 
 ---
 
